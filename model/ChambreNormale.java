@@ -6,6 +6,7 @@ import java.util.Date;
 
 public class ChambreNormale extends Chambre implements Reservable {
 
+    private String[] servicesNormal;
     // Constructeur, getters, setters
 
     // Implémentation des méthodes de l'interface Reservable
