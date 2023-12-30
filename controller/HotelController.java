@@ -13,7 +13,7 @@ public class HotelController {
 
      public HotelController() {
         // Initialisation si nécessaire
-       //fdfdghgfhdfgdhfbdhd
+       //bonjour
     }
     
 
