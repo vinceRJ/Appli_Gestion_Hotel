@@ -1,6 +1,10 @@
 package model;
 
-public class Facture {
+import java.io.Serializable;
+
+public class Facture implements Serializable{
+    private static final long serialVersionUID = 1L;
+    
     private int idFacture;
     private Reservation reservation;
     private double prixChambre;

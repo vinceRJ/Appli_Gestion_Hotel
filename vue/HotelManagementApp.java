@@ -14,7 +14,11 @@ public class HotelManagementApp {
     }
 
     public void run() {
-        controller.afficherMenuPrincipal();
+        //controller.creerChambreNormal();
+        //controller.creerChambreDeLuxe();
+        controller.chargerChambreNormal();
+        controller.chargerChambreDeLuxe();
+        controller.afficherDetailsChambres();
     }
 
     public static void main(String[] args) {

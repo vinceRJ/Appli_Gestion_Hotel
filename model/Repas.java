@@ -1,6 +1,10 @@
 package model;
 
-public class Repas {
+import java.io.Serializable;
+
+public class Repas implements Serializable{
+    private static final long serialVersionUID = 1L;
+
     private int idRepas;
     private Client client;
     private String typeRepas;

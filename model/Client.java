@@ -1,6 +1,12 @@
 package model;
 
-public class Client {
+
+import java.io.Serializable;
+
+public class Client implements Serializable{
+    private static final long serialVersionUID = 1L;
+
+
     private int idClient;
     private String nom;
     private String prenom;

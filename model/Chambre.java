@@ -1,6 +1,12 @@
 package model;
 
-public class Chambre {
+
+import java.io.Serializable;
+
+
+public class Chambre implements Serializable{
+    private static final long serialVersionUID = 1L;
+    
     private int numeroChambre;
     private String typeChambre;
     private boolean disponible;
@@ -24,8 +30,8 @@ public class Chambre {
         return typeChambre;
     }
 
-    public boolean isDisponible() {
-        return disponible;
+    public String getDisponible() {
+        return disponible ? "Oui" : "Non";
     }
 
     public double getPrix() {
@@ -51,4 +57,15 @@ public class Chambre {
         this.prix = prix;
     }
 
+
+
+    @Override
+    public String toString() {
+        return "{" +
+            " numeroChambre='" + getNumeroChambre() + "'" +
+            ", typeChambre='" + getTypeChambre() + "'" +
+            ", disponible='" + isDisponible() + "'" +
+            ", prix='" + getPrix() + "'" +
+            "}";
+    }
 }
