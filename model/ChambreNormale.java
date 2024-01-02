@@ -82,8 +82,8 @@ public class ChambreNormale extends Chambre implements Reservable, Serializable 
         return 
             "services normale=" +  Arrays.toString(servicesNormaux)  +
             ", vue Sur Mer='" + getVueSurMer() + "'" +
-            ", litSimple='" + getLitSimple() + "'" +
-            ", litDouble='" + getLitDouble() + "'" ;
+            ", lit Simple='" + getLitSimple() + "'" +
+            ", lit Double='" + getLitDouble() + "'" ;
     }
 
 }

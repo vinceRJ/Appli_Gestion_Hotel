@@ -79,8 +79,8 @@ public class ChambreDeLuxe extends Chambre implements Reservable, Serializable {
         return 
             "services Supplementaires=" +  Arrays.toString(servicesSupplementaires)  +
             ", jacuzzi='" + getJacuzzi() + "'" +
-            ", litSimple='" + getLitSimple() + "'" +
-            ", litDouble='" + getLitDouble() + "'" ;
+            ", lit Simple='" + getLitSimple() + "'" +
+            ", lit Double='" + getLitDouble() + "'" ;
     }
 
 

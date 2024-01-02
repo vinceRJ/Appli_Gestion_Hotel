@@ -16,9 +16,14 @@ import model.ChambreDeLuxe;
 import model.ChambreNormale;
 import model.Reservation;
 import model.Repas;
+import model.Reservable;
 import model.Facture;
 import java.io.*;
 import java.sql.Array;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
 
 
 
@@ -26,18 +31,19 @@ import java.sql.Array;
 
 public class HotelController {
     private final Scanner scanner;
-
-    private List<Reservation> reservation;
+    private static int idReservationCounter = 0;
+    private static int idCounter = 1;
+    public List<Reservation> reservations = new ArrayList<>();
     private List<Repas> repas;
     private List<Facture> factures;
-    private List<Client> clients;
+    private static List<Client> clients = new ArrayList<>();
     private List<ChambreNormale> chambreNormale = new ArrayList<>();
     private List<ChambreDeLuxe> chambreDeLuxe = new ArrayList<>();
     private List<Chambre> chambre;
 
     public HotelController() {
         this.scanner = new Scanner(System.in);
-        // Initialisations supplémentaires si nécessaires
+        // Initialisations supplémentaires si nécessaires tel ajouter des chambres ou des repas
     }
 
     public void afficherMenuPrincipal() {
@@ -70,7 +76,13 @@ public class HotelController {
                 afficherDisponibilitesChambres();
                 break;
             case 3:
-                effectuerReservation();
+                // creation client
+                Client clientcree = creerClient();
+                Chambre chambreChoisi = choixChambre();
+                Date laDateDebut = demanderDateSejour()[0];
+                Date laDateFin = demanderDateSejour()[1];
+                effectuerReservation(clientcree, chambreChoisi, laDateDebut, laDateFin);
+                afficherReservation();
                 break;
             case 4:
                 modifierReservation();
@@ -101,6 +113,7 @@ public class HotelController {
         System.out.println("Choisissez le type de chambre à afficher :");
         System.out.println("1. Chambre de luxe ");
         System.out.println("2. Chambre Normaux");
+        System.out.print("Choisissez une option : ");
 
         int choix = scanner.nextInt();
 
@@ -120,14 +133,7 @@ public class HotelController {
         System.out.println("Les Chambres de Luxe :");
         System.out.println("_________________________________________________________________________________________________________________________");
         for (ChambreDeLuxe chambre : chambreDeLuxe) {
-            System.out.print("Numero de chambre : " + chambre.getNumeroChambre()+", "); 
-            System.out.print(" Type de chambre: " + chambre.getTypeChambre()+", ");
-            System.out.print(" Disponible: " + chambre.getDisponible()+", ");
-            System.out.println(" Prix: " + chambre.getPrix()+"euros");
-            System.out.println(chambre);
-            System.out.println("_________________________________________________________________________________________________________________________");
-
-            
+            AffichageChambre(chambre);
         }
     }
 
@@ -135,23 +141,167 @@ public class HotelController {
         System.out.println("Les Chambres Normaux :");
         System.out.println("_________________________________________________________________________________________________________________________");
         for (ChambreNormale chambre : chambreNormale) {
-            System.out.print("Numero de chambre : " + chambre.getNumeroChambre()+", "); 
-            System.out.print(" Type de chambre: " + chambre.getTypeChambre()+", ");
-            System.out.print(" Disponible: " + chambre.getDisponible()+", ");
-            System.out.println(" Prix: " + chambre.getPrix()+"euros");
-            System.out.println(chambre);
-            System.out.println("_________________________________________________________________________________________________________________________");
-            
+            AffichageChambre(chambre);
         }
     }
 
 
     private void afficherDisponibilitesChambres() {
-        // Logique pour afficher la disponibilité des chambres
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Vous voulez voir les disponibilites de quel type de chambre");
+        System.out.println("1. Chambre de luxe ");
+        System.out.println("2. Chambre Normaux");
+        System.out.print("Choisissez une option : ");
+
+        int choix = scanner.nextInt();
+        switch (choix) {
+            case 1:
+                disponibilitesChambresDeLuxe();
+                break;
+            case 2:
+                disponibilitesChambresNormales();
+                break;
+            default:
+                System.out.println("Votre choix est invalide");
+        }
+
     }
 
-    private void effectuerReservation() {
-        // Logique pour effectuer une réservation
+    private void disponibilitesChambresDeLuxe() {
+        System.out.println("Les Chambres de Luxe disponibles sont :");
+        System.out.println("_________________________________________________________________________________________________________________________");
+        for (ChambreDeLuxe chambre : chambreDeLuxe) {
+            if (chambre.getDisponible()== "Oui") {
+                AffichageChambre(chambre);
+            }
+        }
+    }
+
+    private void disponibilitesChambresNormales(){
+        System.out.println("Les Chambres Normaux disponibles sont :");
+        System.out.println("_________________________________________________________________________________________________________________________");
+        for (ChambreNormale chambre : chambreNormale) {
+            if (chambre.getDisponible()== "Oui") {
+                AffichageChambre(chambre);
+            }
+        }
+
+    }
+    //  Methode qui affiche les elements de la chambre 
+    private void AffichageChambre(Chambre chambre){
+        System.out.print("Numero de chambre : " + chambre.getNumeroChambre()+", "); 
+        System.out.print(" Type de chambre: " + chambre.getTypeChambre()+", ");
+        System.out.print(" Disponible: " + chambre.getDisponible()+", ");
+        System.out.println(" Prix: " + chambre.getPrix()+" euros");
+        System.out.println(chambre);
+        System.out.println("_________________________________________________________________________________________________________________________");
+    }
+
+
+
+    private void effectuerReservation(Client client, Chambre chambre, Date dateDebut, Date dateFin) {
+        
+        //  generation d'un identifiant unique pour la reservation 
+        int idReservation = genererIdReservation();
+
+        //  creation d'une instance de la reservation
+        Reservation reservation = new Reservation(idReservation, client, chambre, dateDebut, dateFin);
+        
+        //  utilisation de l'interface Reservable pour effectuer la reservation
+        if (chambre instanceof Reservable) {
+             // Vérification de la disponibilité de la chambre pour les dates spécifiées
+            if (estDisponiblePourLesDates(chambre, dateDebut, dateFin)) {           
+                Reservable chambreReservable = (Reservable)chambre; // casting explicite 
+                chambreReservable.makeReservation(client, chambre, dateDebut, dateFin);
+
+                //  ajout de la reservation dans la liste des reservations
+                ajouterReservation(reservation);
+
+                //  Sauvegarde de la reservation
+                sauvegarderReservation();
+
+                // Mise à jour de l'état de la chambre
+                chambre.setDisponible(false);
+
+                System.out.println("La réservation a été effectuée avec succès. L'ID de réservation est : " + idReservation);
+            }
+            else{
+                System.out.println("La chambre n'est pas disponible pour les dates spécifiées.");
+            }
+        }
+        else {
+            System.out.println("Cette chambre ne peut pas être réservée.");
+        }
+    }
+
+    private void ajouterReservation(Reservation reservation) {
+        reservations.add(reservation);
+    }
+
+
+
+    public boolean estDisponiblePourLesDates(Chambre chambre, Date dateDebut, Date dateFin) {
+        for(Reservation reservations : reservations){
+            if ((chambre.equals(reservations.getChambre()))) {
+                // comparaison de la chambre spécifiée avec la chambre associée à la réservation en cours de vérification.
+                if (dateDebut.before(reservations.getDateFin()) && dateFin.after(reservation.getDateDebut())) {
+                    // Les dates se chevauchent avec une réservation existante
+                    return false;
+                }
+            }   
+        }
+        //  La chambre est disponible pour les dates spécifiées
+        return true;
+    }
+
+    private int genererIdReservation() {
+        return ++idReservationCounter;
+    }
+
+
+    private void afficherReservation() {
+        System.out.println("Les reservation sont :");
+        System.out.println("_________________________________________________________________________________________________________________________");
+        for (Reservation reservation : reservations) {
+            affichageReservation(reservation);
+        }
+    }
+
+    public String affichageReservation(Reservation reservation) {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        return "Réservation #" + reservation.getIdReservation() + " :\n" +
+                "Client : " + reservation.getClient().getNom() + " (" + reservation.getClient().getNumeroTel() + ")\n" +
+                "Chambre : " + reservation.getChambre().getNumeroChambre() + " - " + reservation.getChambre().getTypeChambre() + "\n" +
+                "Dates du séjour : " + dateFormat.format(reservation.getDateDebut()) + " au " + dateFormat.format(reservation.getDateFin());
+    }
+
+    public Date[] demanderDateSejour() {
+        Scanner scanner = new Scanner(System.in);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        Date dateDebut = null;
+        Date dateFin = null;
+
+        try {
+            System.out.print("Entrez la date de début du séjour (format dd/MM/yyyy) : ");
+            dateDebut = dateFormat.parse(scanner.nextLine());
+
+            System.out.print("Entrez la date de fin du séjour (format dd/MM/yyyy) : ");
+            dateFin = dateFormat.parse(scanner.nextLine());
+
+            if (dateDebut.after(dateFin)) {
+                System.out.println("La date de début ne peut pas être après la date de fin.");
+                return null;
+            }
+        } catch (ParseException e) {
+            System.out.println("Format de date incorrect. Utilisez le format dd/MM/yyyy.");
+            return null;
+        }
+
+        return new Date[]{dateDebut, dateFin};
     }
 
     private void modifierReservation() {
@@ -179,11 +329,13 @@ public class HotelController {
 
 
     public void sauvegarderReservation(){
-        sauvegarderListeDansFichier(reservation, "reservations.ser");
+        sauvegarderListeDansFichier(reservations, "reservations.ser");
+        System.out.println("la Reservation a bien été sauvegardé avec succès.");
     }
 
-    public void sauvegarderClients() {
+    public static void sauvegarderClients() {
         sauvegarderListeDansFichier(clients, "clients.ser");
+        System.out.println("le Client a bien été sauvegardé avec succès.");
     }
 
     public void sauvegarderRepas() {
@@ -196,16 +348,16 @@ public class HotelController {
 
     public void sauvegarderChambreNormale() {
         sauvegarderListeDansFichier(chambreNormale, "chambreNormal.ser");
+        System.out.println("Chambre a bien été sauvegardé avec succès.");
     }
 
     public void sauvegarderChambreDeLuxe() {
-        sauvegarderListeDansFichier(chambreDeLuxe, "chambreDeLuxe.ser");
+        System.out.println("Chambre a bien été sauvegardé avec succès.");
     }
     
-    private <T extends Serializable> void sauvegarderListeDansFichier(List<T> liste, String nomFichier) {
+    private static <T extends Serializable> void sauvegarderListeDansFichier(List<T> liste, String nomFichier) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomFichier))) {
             oos.writeObject(liste);
-            System.out.println("État de l'hôtel a bien été sauvegardé avec succès.");
         } catch (IOException e) {
             System.err.println("Erreur lors de la sauvegarde de l'état de l'hôtel : " + e.getMessage());
         }
@@ -253,9 +405,9 @@ public class HotelController {
 
 
 
-////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////
-// ========================CREATION DES CHAMBRE ============================    
+    ////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    // ========================METHODE DES CHAMBRE ============================    
 
     public void creerChambreDeLuxe(){
         //chambreDeLuxe = new ArrayList();
@@ -305,9 +457,79 @@ public class HotelController {
         sauvegarderChambreNormale();
     
     }
-//================================FIN DE LA CREATION ================================
+
+    public Chambre choixChambre(){
+        Scanner scanner = new Scanner(System.in);
+
+        afficherChambresDeLuxe();
+        afficherChambresNormales();
+
+        //  l'utilisateur choisit une chambre en entrant le numéro
+        System.out.println("Entrez le numéro de la chambre que vous souhaitez réserver : ");
+        int numeroChambreChoisi = scanner.nextInt();
+
+        // Recherche de la chambre choisie parmi les chambres de luxe
+        for (ChambreDeLuxe chambreDeLuxe : chambreDeLuxe) {
+            if (chambreDeLuxe.getNumeroChambre() == numeroChambreChoisi) {
+                return chambreDeLuxe;
+            }
+        }
+        // Recherche de la chambre choisie parmi les chambres normales
+        for (ChambreNormale chambreNormale : chambreNormale) {
+            if (chambreNormale.getNumeroChambre() == numeroChambreChoisi) {
+                return chambreNormale;
+            }
+        }
+
+        // cas ou le numero de chambre n'est pas valide
+        System.out.println("Numéro de chambre non valide.");
+        return null;
+    }
+
+    //================================FIN DE LA CREATION ================================
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //================================ Creation, Sauvegarde et Charge Client =================================
+    // Méthode statique pour créer un client depuis la ligne de commande
+    public static Client creerClient() {
+        
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Entrez le nom du client : ");
+        String nom = scanner.nextLine();
+
+        System.out.println("Entrez le prénom du client : ");
+        String prenom = scanner.nextLine();
+
+        System.out.println("Entrez l'adresse du client : ");
+        String adresse = scanner.nextLine();
+
+        System.out.println("Entrez le numéro de téléphone du client : ");
+        String numeroTel = scanner.nextLine();
+
+        // L'ID est généré automatiquement
+        int idClient = idCounter++;
+        
+        // Crée une nouvelle instance de Client
+        Client client = new Client(idClient, nom, prenom, adresse, numeroTel);
+
+        // Ajout du client  à la liste
+        ajouterClient(client);
+
+        //sauvegarde le client
+        sauvegarderClients();
+
+        //retourne une nouvelle instance de Client
+        return client;
+    }
+    private static void ajouterClient(Client client) {
+        clients.add(client);
+    }
 
 
 
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////    FIN     ///////////////////////////////////////////////////////////
 }

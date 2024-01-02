@@ -64,8 +64,10 @@ public class Chambre implements Serializable{
         return "{" +
             " numeroChambre='" + getNumeroChambre() + "'" +
             ", typeChambre='" + getTypeChambre() + "'" +
-            ", disponible='" + isDisponible() + "'" +
+            ", disponible='" + getDisponible() + "'" +
             ", prix='" + getPrix() + "'" +
             "}";
     }
+
+    
 }

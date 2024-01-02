@@ -2,6 +2,7 @@ package model;
 
 import java.util.Date;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 
 public class Reservation implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -63,4 +64,21 @@ public class Reservation implements Serializable{
     public void setDateFin(Date dateFin) {
         this.dateFin = dateFin;
     }
+
+
+
+    @Override
+    public String toString() {
+        return "{" +
+            " idReservation='" + getIdReservation() + "'" +
+            ", client='" + getClient() + "'" +
+            ", chambre='" + getChambre() + "'" +
+            ", dateDebut='" + getDateDebut() + "'" +
+            ", dateFin='" + getDateFin() + "'" +
+            "}";
+    }
+
+    
+
+
 }
