@@ -3,10 +3,10 @@
 package model;
 
 import java.util.Arrays;
-import java.util.Date;
-import java.io.Serializable;
 
-public class ChambreNormale extends Chambre implements Reservable, Serializable {
+
+
+public class ChambreNormale extends Chambre implements Reservable {
     private static final long serialVersionUID = 1L;
 
 
@@ -27,12 +27,12 @@ public class ChambreNormale extends Chambre implements Reservable, Serializable 
     }
 
     @Override
-    public void makeReservation(Client client, Chambre chambre, Date dateDebut, Date dateFin) {
+    public void makeReservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
         // Logique de réservation pour une chambre normale
     }
 
     @Override
-    public void modifyReservation(Reservation reservation, Chambre newChambre, Date newDateDebut, Date newDateFin) {
+    public void modifyReservation(Reservation reservation, Chambre newChambre, String newDateDebut, String newDateFin) {
         // Logique de modification de réservation pour une chambre normale
     }
 

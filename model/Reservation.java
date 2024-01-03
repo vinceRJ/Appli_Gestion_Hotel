@@ -1,8 +1,7 @@
 package model;
 
-import java.util.Date;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
+
 
 public class Reservation implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -11,11 +10,11 @@ public class Reservation implements Serializable{
     private int idReservation;
     private Client client;
     private Chambre chambre;
-    private Date dateDebut;
-    private Date dateFin;
+    private String dateDebut;
+    private String dateFin;
 
     // Constructeur
-    public Reservation(int idReservation, Client client, Chambre chambre, Date dateDebut, Date dateFin) {
+    public Reservation(int idReservation, Client client, Chambre chambre, String dateDebut, String dateFin) {
         this.idReservation = idReservation;
         this.client = client;
         this.chambre = chambre;
@@ -36,11 +35,11 @@ public class Reservation implements Serializable{
         return chambre;
     }
 
-    public Date getDateDebut() {
+    public String getDateDebut() {
         return dateDebut;
     }
 
-    public Date getDateFin() {
+    public String getDateFin() {
         return dateFin;
     }
 
@@ -57,11 +56,11 @@ public class Reservation implements Serializable{
         this.chambre = chambre;
     }
 
-    public void setDateDebut(Date dateDebut) {
+    public void setDateDebut(String dateDebut) {
         this.dateDebut = dateDebut;
     }
 
-    public void setDateFin(Date dateFin) {
+    public void setDateFin(String dateFin) {
         this.dateFin = dateFin;
     }
 
