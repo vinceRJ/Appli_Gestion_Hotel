@@ -1,7 +1,13 @@
 package model;
 
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.List;
 
 
 public class Chambre implements Serializable{
@@ -19,6 +25,11 @@ public class Chambre implements Serializable{
         this.typeChambre = typeChambre;
         this.disponible = disponible;
         this.prix = prix;
+    }
+     
+    // constructeur sans parametres
+    public Chambre(){
+
     }
 
     //getters
@@ -67,6 +78,42 @@ public class Chambre implements Serializable{
             ", disponible='" + getDisponible() + "'" +
             ", prix='" + getPrix() + "'" +
             "}";
+    }
+
+    protected void messageAfficheChambres() {
+        System.out.println("voici la liste des chambres :");
+        System.out.println("_________________________________________________________________________________________________________________________");
+        
+    }
+
+    //  Methode qui affiche les elements de la chambre 
+    protected void AffichageChambre(Chambre chambre){
+        System.out.print("Numero de chambre : " + chambre.getNumeroChambre()+", "); 
+        System.out.print(" Type de chambre: " + chambre.getTypeChambre()+", ");
+        System.out.print(" Disponible: " + chambre.getDisponible()+", ");
+        System.out.println(" Prix: " + chambre.getPrix()+" euros");
+        System.out.println(chambre);
+        System.out.println("_________________________________________________________________________________________________________________________");
+    }
+
+    protected static <T extends Serializable> void chargerListeDepuisFichier(String nomFichier, List<T> liste) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))) {
+            liste.clear();  // Efface la liste actuelle avant de charger
+            List<T> listeChargee = (List<T>) ois.readObject();
+            liste.addAll(listeChargee);
+            System.out.println("Recuperation des données effectué avec succès !");
+        } catch (IOException | ClassNotFoundException e) {
+           System.err.println("Erreur lors du chargement de l'etat de l'hote : "+ e.getMessage());
+            
+        }
+    }
+
+    protected static <T extends Serializable> void sauvegarderListeDansFichier(List<T> liste, String nomFichier) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomFichier))) {
+            oos.writeObject(liste);
+        } catch (IOException e) {
+            System.err.println("Erreur lors de la sauvegarde de l'état de l'hôtel : " + e.getMessage());
+        }
     }
 
     
