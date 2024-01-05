@@ -17,17 +17,24 @@ public class Reservation implements Serializable{
     
     private int idReservation;
     private Client client;
-    private Chambre chambre;
+    public Chambre chambre;
     private String dateDebut;
     private String dateFin;
 
     // Constructeur
-    public Reservation(int idReservation, Client client, Chambre chambre, String dateDebut, String dateFin) {
-        this.idReservation = idReservation;
+    public Reservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
+        this.idReservation = 1;
         this.client = client;
         this.chambre = chambre;
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
+
+        this.idReservation ++;
+    }
+
+    // construteur sans parametre
+    public Reservation(){
+
     }
 
     // Getters
@@ -52,9 +59,7 @@ public class Reservation implements Serializable{
     }
 
     // Setters
-    public void setIdReservation(int idReservation) {
-        this.idReservation = idReservation;
-    }
+   
 
     public void setClient(Client client) {
         this.client = client;
@@ -85,18 +90,31 @@ public class Reservation implements Serializable{
             "}";
     }
 
-    private static void ajouterReservation(Reservation reservation) {
+    // ajout de la reservation dans la liste 
+    public static void ajouterReservation(Reservation reservation) {
         reservations.add(reservation);
     }
-    public void sauvegarderReservation(){
+
+    public void sauvegarderModification() {
+        // Supprimer l'ancienne réservation de la liste
+        reservations.remove(this);
+        // Ajout de la réservation modifiée à la liste
+        reservations.add(this);
+        // Sauvegarder la liste mise à jour dans le fichier 
+        sauvegarderReservation();
+    }
+
+
+    //// sauvegarde  dans le fichier
+    public static void sauvegarderReservation(){
         sauvegarderListeDansFichier(reservations, "reservations.ser");
         System.out.println("la Reservation a bien été sauvegardé avec succès.");
     }
+
+
     public void chargerReservations() {
         chargerListeDepuisFichier("reservations.ser", reservations);
     }
-
-    
 
     private static <T extends Serializable> void sauvegarderListeDansFichier(List<T> liste, String nomFichier) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(nomFichier))) {

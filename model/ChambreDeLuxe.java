@@ -30,19 +30,57 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
 
     }
 
-    @Override
     public void makeReservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
-        // Logique de réservation pour une chambre de luxe
+        if (chambre.getDisponible()== "Non") {
+            System.out.println("cette chambre n'est pas Disponible ! ");
+        }      
+        
+        Reservation laReservation = new Reservation(client, this, dateDebut, dateFin);
+
+        // Ajouter la réservation à la liste des réservations
+        Reservation.ajouterReservation(laReservation);
+
+        //// sauvegarde  dans le fichier
+        Reservation.sauvegarderReservation();
+
     }
 
-    @Override
-    public void modifyReservation(Reservation reservation, Chambre newChambre, String newDateDebut, String newDateFin) {
-        // Logique de modification de réservation pour une chambre de luxe
+    
+    public void modifyReservation(Reservation reservation, Chambre nouvelleChambre, String newDateDebut, String newDateFin) {
+        if (!Reservation.reservations.contains(reservation)) { // si la n'est pas dans la liste des réservations
+            System.out.println("La réservation spécifiée n'existe pas pour la chambre");
+            return; 
+        }
+
+        //Vérifier la disponibilité de la nouvelle chambre 
+        if (nouvelleChambre.getDisponible() == "Non") {
+            System.out.println("La nouvelle chambre n'est pas disponible.");
+            return;   
+        }
+
+        reservation.setChambre(nouvelleChambre);
+        reservation.setDateDebut(newDateDebut);
+        reservation.setDateFin(newDateFin);
+        reservation.sauvegarderModification();
+
+        // l'ancienne chambre devient disponible
+        reservation.chambre.setDisponible(true);
+
+        // la nouvelle chambre devient indisponible
+
+        nouvelleChambre.setDisponible(false);
+        System.out.println("Modification de la réservation effectuée avec succès.");
     }
 
-    @Override
     public void cancelReservation(Reservation reservation) {
-        // Logique d'annulation de réservation pour une chambre de luxe
+        if(Reservation.reservations.contains(reservation)){
+            // Supprimer la réservation de la liste
+            Reservation.reservations.remove(reservation);
+
+            //mise à jour dans de la liste 
+            Reservation.sauvegarderReservation();
+
+        }
     }
 
     public String[] getServicesSupplementaires() {
@@ -163,6 +201,12 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
     
         // Retourne la nouvelle instance de ChambreDeLuxe
         return nouvelleChambre;
+    }
+
+    @Override
+    public void Reservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'Reservation'");
     }
 
     
