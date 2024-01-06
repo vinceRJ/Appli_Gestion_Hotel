@@ -125,6 +125,31 @@ public class Client implements Serializable{
         }
     }
 
+    public static Client choixClientPourReservation(){
+        Client clientChoisi = new Client();
+        Scanner scanner = new Scanner(System.in);
+        chargerClients();
+
+        System.out.println("Clients disponibles :");
+        int choix = 1;
+        for (Client client : clients) {
+            System.out.println(choix + ". " + client.getNom() + " " + client.getPrenom() + " " + client.getNumeroTel() + " " + client.getAdresse());
+            choix++;
+        }
+        System.out.print("Choisissez le numéro du client que vous souhaitez sélectionner (ou 0 pour annuler) :\n=> ");
+        int numeroChoisi = scanner.nextInt();
+
+        if (numeroChoisi > 0 && numeroChoisi <= choix - 1) {
+            clientChoisi = clients.get(numeroChoisi - 1);
+            return clientChoisi;
+        } else {
+            System.out.println("Opération annulée. Aucun client sélectionné.");
+            return null;
+        }
+
+
+    }
+
     private static <T extends Serializable> void chargerListeDepuisFichier(String nomFichier, List<T> liste) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))) {
             liste.clear();  // Efface la liste actuelle avant de charger

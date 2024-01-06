@@ -15,9 +15,6 @@ import model.ChambreDeLuxe;
 import model.ChambreNormale;
 import model.Reservation;
 import model.Repas;
-import model.Reservable;
-import model.Facture;
-import java.io.*;
 
 
 
@@ -28,12 +25,14 @@ public class HotelController {
     private Client newClient;
     private ChambreDeLuxe newChambreDeLuxe;
     private ChambreNormale newChambreNormale;
+    private Repas newRepas;
 
     public HotelController() {
         this.scanner = new Scanner(System.in);
         this.newClient = new Client();
         this.newChambreDeLuxe = new ChambreDeLuxe();
         this.newChambreNormale = new ChambreNormale();
+        this.newRepas = new Repas();
 
         // Initialisations supplémentaires  tel ajouter des chambres ou des repas ou reservation
     }
@@ -41,24 +40,26 @@ public class HotelController {
     public void afficherMenuPrincipal() {
         int choix;
         do {
-            System.out.println("=== Menu Principal ===");
-            System.out.println("1. Les chambres");
-            System.out.println("2. Effectuer une réservation (en cours d'implementation)");
-            System.out.println("3. Modifier une réservation (pas encore implementé)");
-            System.out.println("4. Annuler une réservation (pas encore implementé)");
-            System.out.println("5. Commander un repas (pas encore implementé)");  // TAFF Ornel
-            System.out.println("6. Enregistrer la facture (pas encore implementé)");
-            System.out.println("7. Options  client ");
-            System.out.println("8. Options  repas "); // TAFF Ornel
-            System.out.println("9. Quitter");
+            System.out.println(""); //
+            System.out.println("============================= Menu Principal =============================");
+            System.out.println("1. Gestion des chambres");
+            System.out.println("2. Effectuer une réservation ");
+            System.out.println("3. Modifier une réservation (en cours d'implementation)");
+            System.out.println("4. Afficher la liste des reservations ");
+            System.out.println("5. Annuler une réservation (pas encore implementé)");
+            System.out.println("6. Commander un repas ");  
+            System.out.println("7. Enregistrer la facture (pas encore implementé)");
+            System.out.println("8. Gestion des client ");
+            System.out.println("9. Gestion des repas "); 
+            System.out.println("10. Quitter");
             
             System.out.print("Choisissez une option : ");
 
             choix = scanner.nextInt();
-            scanner.nextLine(); // Pour consommer la nouvelle ligne après la saisie du choix
+            scanner.nextLine(); 
 
             traiterChoixMenuPrincipal(choix);
-        } while (choix != 9);
+        } while (choix != 10);
     }
 
     private void traiterChoixMenuPrincipal(int choix1) {
@@ -67,35 +68,30 @@ public class HotelController {
             menuGestionChambre();
                 break;
             case 2:
-                /*/ creation client
-                Client clientcree = new Client();
-                clientcree.creerClient();
-                Chambre chambreChoisi = choixChambre();
-                String laDateDebut = demanderDateDebut();  
-                String laDateFin = demanderDateFin();     
-                effectuerReservation(clientcree, chambreChoisi, laDateDebut, laDateFin);
-                afficherReservation();*/
-                
+                effectuerReservation();
                 break;
             case 3:
-                //modifierReservation();
+                modifierReservation();
                 break;
             case 4:
-               // annulerReservation();
+                Reservation.afficherReservation();
                 break;
             case 5:
-                commanderRepas();
+               // annulerReservation();
                 break;
             case 6:
-                enregistrerFacture();
+                commanderRepas();
                 break;
             case 7:
-                optionClient();
+                enregistrerFacture();
                 break;
             case 8:
-                System.out.println("MET TA METHODE ICI");
+                optionClient();
                 break;
             case 9:
+                optionRepas();
+                break;
+            case 10:
                 System.out.println("Fin du programme !");
                 break;
             default:
@@ -103,7 +99,7 @@ public class HotelController {
         }
     }
 
-    //----------------------------------------------------------------Gesttion des chambre ----------------------------------------------------------------
+//----------------------------------------------------------------Gesttion des chambre ----------------------------------------------------------------
     
     // methode afficher les option des chambres (choix 1)
     public void menuGestionChambre(){
@@ -115,8 +111,8 @@ public class HotelController {
             System.out.print("Choisissez une option : \n=> ");
             choix2 = scanner.nextInt();
             scanner.nextLine(); 
-            newChambreDeLuxe.chargerChambreDeLuxe();
-            newChambreNormale.chargerChambreNormal();
+            ChambreDeLuxe.chargerChambreDeLuxe();
+            ChambreNormale.chargerChambreNormal();
 
             traiterOptionChambre(choix2);
 
@@ -143,7 +139,6 @@ public class HotelController {
     }
 
     public void afficherDetailsChambres() {
-        Scanner scanner = new Scanner(System.in);
                 
         System.out.println("Choisissez le type de chambre à afficher :");
         System.out.println("1. Chambre de luxe ");
@@ -170,7 +165,6 @@ public class HotelController {
     }
 
     private void afficherDisponibilitesChambres() {
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Vous voulez voir les disponibilites de quel type de chambre");
         System.out.println("1. Chambre de luxe ");
@@ -194,12 +188,9 @@ public class HotelController {
             default:
                 System.out.println("Votre choix est invalide");
         }
-        
-
     }
 
     private void ajouterChambre(){
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println("Vous voulez ajouter  quel type de chambre");
         System.out.println("1. Chambre de luxe ");
@@ -222,19 +213,119 @@ public class HotelController {
         }      
     }
     
-    //----------------------------------------------------------------Fin gestion des chambres ----------------------------------------------------------------
-    
-    // choix 5
-    private void commanderRepas() {
-        // Ici tu vas faire appel aux methode necessaire et la logique pour passer la commande du repas
+//----------------------------------------------------------------Fin gestion des chambres ----------------------------------------------------------------
+
+//---------------------------------------------------------------- Gestion des Reservations ----------------------------------------------------------------
+    // choix 2
+    private void effectuerReservation(){
+        int choix6;
+        do{
+            System.out.println("=== Interface de reservation de chambre ===\nQuel type de chambre souhaitez-vous prendre ?\n1. Chambre Normal\n2. Chambre de Luxe");
+            System.out.println("3. Quitter ce menu");
+            System.out.print("Choisissez une option : \n=> ");
+            choix6 = scanner.nextInt();
+
+            traiterOptionReservation(choix6);
+            
+        }while(choix6 != 3);
+
+    }
+    // traitement de la reservation
+    private void traiterOptionReservation(int choix){
+        Client clientQuiReserve = new Client();
+        clientQuiReserve = Client.choixClientPourReservation();
+
+        switch (choix) {
+            case 1:
+                ChambreNormale chambreReserve = new ChambreNormale();
+                                
+                // la methode FaireReservation est une  methde non static voila pourquoi je crée une instance
+                ChambreNormale chambreReser = new ChambreNormale();
+
+                chambreReserve = ChambreNormale.ChoixChambresNormalesPourReservation();
+                
+                String laDateDebut = Reservation.demanderDateDebut();  
+                String laDateFin = Reservation.demanderDateFin();
+
+                chambreReser.FaireReservation(clientQuiReserve, chambreReserve, laDateDebut, laDateFin);
+                break;
+            case 2:
+                ChambreDeLuxe chambreLuxeReserve = new ChambreDeLuxe();
+                
+                // la methode FaireReservation est une  methde non static voila pourquoi je crée une instance
+                ChambreDeLuxe chambreReserL = new ChambreDeLuxe();
+
+                chambreLuxeReserve = ChambreDeLuxe.ChoixChambresLuxePourReservation();
+                String laDateDebutL = Reservation.demanderDateDebut();  
+                String laDateFinL = Reservation.demanderDateFin();
+
+                chambreReserL.FaireReservation(clientQuiReserve, chambreLuxeReserve, laDateDebutL, laDateFinL);
+                break;
+            case 3:
+                System.out.println("Au revoir !");
+                break;
+        }
+
     }
 
-    // choix 6
+    //choix 3
+    private void modifierReservation(){
+        int choix;
+        do{
+            System.out.println("=== Interface de modification de reservation de chambre ===\nVotre reservation concerne quel type ?\n1. Chambre Normal\n2. Chambre de Luxe");
+            System.out.println("3. Quitter ce menu");
+            System.out.print("Choisissez une option : \n=> ");
+            choix = scanner.nextInt();
+            
+            traiterModifReservation(choix);
+        }while(choix != 3);
+    }
+
+    private void traiterModifReservation(int choix){
+        Reservation reservationFaite = new Reservation();
+        switch (choix){
+            case 1:
+                reservationFaite =  Reservation.ChoixReservation();
+                ChambreNormale nouvelleChambreReserve = new ChambreNormale();
+
+                ChambreNormale chambreIntermediaire = new ChambreNormale();
+
+                nouvelleChambreReserve = ChambreNormale.ChoixChambresNormalesPourReservation();
+                String laDateDebut = Reservation.demanderDateDebut();  
+                String laDateFin = Reservation.demanderDateFin();
+
+                chambreIntermediaire.modifierReservation(reservationFaite, nouvelleChambreReserve, laDateDebut, laDateFin);
+                break;
+            case 2:
+                reservationFaite =  Reservation.ChoixReservation();
+                ChambreDeLuxe nouvelleChambreReserveL = new ChambreDeLuxe();
+
+                ChambreNormale chambreIntermediaireL = new ChambreNormale();
+                nouvelleChambreReserveL = ChambreDeLuxe.ChoixChambresLuxePourReservation();
+
+                String laDateDebutL = Reservation.demanderDateDebut();  
+                String laDateFinL = Reservation.demanderDateFin();
+
+                chambreIntermediaireL.modifierReservation(reservationFaite, nouvelleChambreReserveL, laDateDebutL, laDateFinL);
+                break;
+            case 3:
+                System.out.println("Au revoir !");
+                break;
+        }
+
+    }
+
+
+
+ //---------------------------------------------------------------- Fin Gestion de la Reservation ----------------------------------------------------------------
+
+    // choix 7
     private void enregistrerFacture() {
        
     }
     
-    
+///////////////////////////////////////////////     GESTION CLIENT        //////////////////////////////////////////////////////////////////
+
     // methode pour gere menu option client (choix 8)
     public void optionClient(){
 
@@ -248,7 +339,7 @@ public class HotelController {
             System.out.print("Choisissez une option : ");
 
             choix = scanner.nextInt();
-            scanner.nextLine(); // Pour consommer la nouvelle ligne après la saisie du choix
+            scanner.nextLine(); 
 
             traiterOptionClient(choix);
         } while (choix != 5);
@@ -273,14 +364,10 @@ public class HotelController {
             case 5:
                 System.out.println("Au revoir !");
                 break;
-            
         }
     }
    
-       
-
     public Chambre choixChambre(){
-        Scanner scanner = new Scanner(System.in);
 
         newChambreDeLuxe.afficherChambresDeLuxe();
         
@@ -290,13 +377,11 @@ public class HotelController {
         System.out.println("Entrez le numéro de la chambre que vous souhaitez réserver : ");
         int numeroChambreChoisi = scanner.nextInt();
 
-        // Recherche de la chambre choisie parmi les chambres de luxe
         for (ChambreDeLuxe chambreDeLuxe : newChambreDeLuxe.getListChambreDeLuxe()) {
             if (chambreDeLuxe.getNumeroChambre() == numeroChambreChoisi) {
                 return chambreDeLuxe;
             }
         }
-        // Recherche de la chambre choisie parmi les chambres normales
         for (ChambreNormale chambreNormale : newChambreNormale.getListChambreNormale()) {
             if (chambreNormale.getNumeroChambre() == numeroChambreChoisi) {
                 return chambreNormale;
@@ -308,97 +393,76 @@ public class HotelController {
         return null;
     }
 
-    
+////////////////////////////////////////////          FIN GESTION CLIENT      //////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////    METHODE POUR lA RESERVATION    /////////////////////////////////
-/* Je finis ca bientot j'ai des erreurs 
-    
+////////////////////////////////////////////    GESTION REPAS        //////////////////////////////////////////////////////////////////    
+    // choix 6
+    private void commanderRepas(){
+        int choix1;
+        do{
+            System.out.println("======================== Interface de commande de repas ===================================\n1. Commander");
+            System.out.println("2. Quitter ce menu");
+           choix1 = scanner.nextInt();
 
-    private void effectuerReservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
-        
-        //  generation d'un identifiant unique pour la reservation 
-        int idReservation = genererIdReservation();
+           traitercommanderRepas(choix1);
+        }while(choix1 != 2);
 
-        //  creation d'une instance de la reservation
-        Reservation reservation = new Reservation(idReservation, client, chambre, dateDebut, dateFin);
-        
-        //  utilisation de l'interface Reservable pour effectuer la reservation
-        if (chambre instanceof Reservable) {
-             // Vérification de la disponibilité de la chambre pour les dates spécifiées
-            if (chambre.getDisponible().equals("Oui")) {           
-                Reservable chambreReservable = (Reservable)chambre; // casting explicite 
-                chambreReservable.makeReservation(client, chambre, dateDebut, dateFin);
 
-                //  ajout de la reservation dans la liste des reservations
-                ajouterReservation(reservation);
-
-                //  Sauvegarde de la reservation
-                sauvegarderReservation();
-
-                // Mise à jour de l'état de la chambre
-                chambre.setDisponible(false);
-
-                System.out.println("La réservation a été effectuée avec succès. L'ID de réservation est : " + idReservation);
-            }
-            else{
-                System.out.println("La chambre n'est pas disponible pour MOMENT.");
-            }
+    }
+    // traiter commander Repas
+    private void traitercommanderRepas(int choix){
+        switch (choix) {
+            case 1:
+                Client clientQuiCommande =  Client.choixClientPourReservation();
+                Repas.commanderRepas(clientQuiCommande, Repas.choisirRepas());
+                System.out.println("Votre commande a ete effectue ! ");
+            case 2:
+                System.out.println("Au revoir !");
+                break;
         }
-        else {
-            System.out.println("Cette chambre ne peut pas être réservée.");
+
+
+    }
+
+    // choix 9
+    private void optionRepas(){
+        Repas.creerPlats();
+        int choix;
+        do {
+            System.out.println("=== Option Repas ===\n1. Ajouter un repas dans liste des repas\n2. Afficher la liste des repas disponible \n3. Afficher les repas commandes");
+            System.out.println("4. Quitter le menu  Repas");
+                        
+            System.out.print("Choisissez une option : ");
+
+            choix = scanner.nextInt();
+            scanner.nextLine(); 
+            traiterOptionRepas(choix);
+        } while (choix != 4);
+
+    }
+
+    //traitement du menu option Repas 
+    private void traiterOptionRepas(int choix) {
+        switch (choix) {
+            case 1:
+                newRepas.creerRepas();
+                break;
+            case 2:
+                Repas.chargerRepas();
+                Repas.listeRepas();
+                break;
+            case 3:
+                Repas.chargerRepasCommander();
+                Repas.listeRepasCommander();
+                break;
+            case 4:
+                System.out.println("Au revoir !");
+                break;
+            
         }
     }
 
+//////////////////////////////////////// FIN GESTION REPAS //////////////////////////////////////////////////////////////////   
 
-    public void afficherReservation() {
-        System.out.println("Les reservation sont :");
-        System.out.println("_________________________________________________________________________________________________________________________");
-        for (Reservation reservation : reservations) {
-            affichageReservation(reservation);
-        }
-    }
 
-    public String affichageReservation(Reservation reservation) {
-        
-        return "Réservation #" + reservation.getIdReservation() + " :\n" +
-                "Client : " + reservation.getClient().getNom() + " (" + reservation.getClient().getNumeroTel() + ")\n" +
-                "Chambre : " + reservation.getChambre().getNumeroChambre() + " - " + reservation.getChambre().getTypeChambre() + "\n" +
-                "Dates du séjour : " + reservation.getDateDebut() + " au " + reservation.getDateFin();
-    }
-
-    public static String demanderDateDebut() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Entrez la date de début du séjour (format dd/MM/yyyy) : ");
-        String dateDebutString = scanner.next();
-    
-        if (dateDebutString.isEmpty()) {
-            System.out.println("Veuillez saisir une date de début valide.");
-            return null;
-        }
-    
-        return dateDebutString;
-    }
-    
-    public static String demanderDateFin() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Entrez la date de fin du séjour (format dd/MM/yyyy) : ");
-        String dateFinString = scanner.next();
-    
-        if (dateFinString.isEmpty()) {
-            System.out.println("Veuillez saisir une date de fin valide.");
-            return null;
-        }
-    
-        return dateFinString;
-    }    
-
-    private void modifierReservation() {
-        // Logique pour modifier une réservation
-    }
-
-    private void annulerReservation() {
-        // Logique pour annuler une réservation
-    }
-
-*/
 }

@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class ChambreDeLuxe extends Chambre implements Reservable {
     private static final long serialVersionUID =  1L;
-    private List<ChambreDeLuxe> chambreDeLuxe = new ArrayList<>();
+    private static List<ChambreDeLuxe> LalisteDeschambreDeLuxe = new ArrayList<>();
 
     private String[] servicesSupplementaires;
     private boolean jacuzzi;
@@ -19,35 +19,39 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
     private boolean litDouble;
 
     public ChambreDeLuxe(int numeroChambre, boolean disponible, double prix, String[] servicesSupplementaires, boolean jacuzzi, boolean litSimple, boolean litDouble) {
-        super(numeroChambre, "ChambreDeLuxe", disponible, prix);
+        super(numeroChambre, "Chambre De Luxe", disponible, prix);
         this.servicesSupplementaires = servicesSupplementaires;
         this.jacuzzi = jacuzzi;
         this.litSimple = litSimple;
         this.litDouble = litDouble;
     }
     public ChambreDeLuxe(){
-        super();
 
     }
 
-    public void makeReservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
+    public void FaireReservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
         if (chambre.getDisponible()== "Non") {
             System.out.println("cette chambre n'est pas Disponible ! ");
         }      
         
-        Reservation laReservation = new Reservation(client, this, dateDebut, dateFin);
+        chambre.setDisponible(false);
+        Reservation laReservation = new Reservation(client, chambre, dateDebut, dateFin);
 
         // Ajouter la réservation à la liste des réservations
         Reservation.ajouterReservation(laReservation);
 
         //// sauvegarde  dans le fichier
         Reservation.sauvegarderReservation();
+        sauvegarderChambreDeLuxe();
+
+        System.out.println("---------------------------- Voici votre reservation ------------------------------------------");
+        Reservation.affichageReservation(laReservation);
 
     }
 
     
-    public void modifyReservation(Reservation reservation, Chambre nouvelleChambre, String newDateDebut, String newDateFin) {
-        if (!Reservation.reservations.contains(reservation)) { // si la n'est pas dans la liste des réservations
+    public void modifierReservation(Reservation reservation, Chambre nouvelleChambre, String newDateDebut, String newDateFin) {
+        if (!Reservation.laListeDesReservations.contains(reservation)) { // si la n'est pas dans la liste des réservations
             System.out.println("La réservation spécifiée n'existe pas pour la chambre");
             return; 
         }
@@ -67,15 +71,15 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
         reservation.chambre.setDisponible(true);
 
         // la nouvelle chambre devient indisponible
-
         nouvelleChambre.setDisponible(false);
         System.out.println("Modification de la réservation effectuée avec succès.");
+        sauvegarderChambreDeLuxe();
     }
 
-    public void cancelReservation(Reservation reservation) {
-        if(Reservation.reservations.contains(reservation)){
+    public void annulerReservation(Reservation reservation) {
+        if(Reservation.laListeDesReservations.contains(reservation)){
             // Supprimer la réservation de la liste
-            Reservation.reservations.remove(reservation);
+            Reservation.laListeDesReservations.remove(reservation);
 
             //mise à jour dans de la liste 
             Reservation.sauvegarderReservation();
@@ -93,7 +97,7 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
 
     //getter
     public List<ChambreDeLuxe> getListChambreDeLuxe(){
-        return this.chambreDeLuxe ;
+        return LalisteDeschambreDeLuxe;
     }
 
     public String getLitDouble() {
@@ -131,24 +135,24 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
     }
 
     //// charger chambre depuis le fichier
-    public void chargerChambreDeLuxe() {
-        chargerListeDepuisFichier("chambreDeLuxe.ser", chambreDeLuxe);
+    public static void chargerChambreDeLuxe() {
+        chargerListeDepuisFichier("chambreDeLuxe.ser", LalisteDeschambreDeLuxe);
     }
 
     //// sauvegarde chambre dans le fichier
-    public void sauvegarderChambreDeLuxe() {
+    public void  sauvegarderChambreDeLuxe() {
         System.out.println("Chambre a bien été sauvegardé avec succès.");
     }
 
     // ajout de la chambre dans la liste des chambre de luxe
     public  void ajouterChambreDeLuxe(ChambreDeLuxe laChambreDeLuxe) {
-        chambreDeLuxe.add(laChambreDeLuxe);
+        LalisteDeschambreDeLuxe.add(laChambreDeLuxe);
     }
 
     // affichage de toutes les chambre de luxes
     public void afficherChambresDeLuxe() {
         messageAfficheChambres();
-        for (ChambreDeLuxe chambre : chambreDeLuxe) {
+        for (ChambreDeLuxe chambre : LalisteDeschambreDeLuxe) {
             AffichageChambre(chambre);
         }
     }
@@ -156,11 +160,43 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
     // afficher chambre de luxe disponible
     public void disponibilitesChambresDeLuxe() {
         messageAfficheChambres();
-        for (ChambreDeLuxe chambre : chambreDeLuxe) {
+        for (ChambreDeLuxe chambre : LalisteDeschambreDeLuxe) {
             if (chambre.getDisponible()== "Oui") {
                 AffichageChambre(chambre);
             }
         }
+    }
+
+    public static ChambreDeLuxe ChoixChambresLuxePourReservation(){
+        ChambreDeLuxe chambreChoisie = new ChambreDeLuxe();
+        Scanner scanner = new Scanner(System.in);
+        chargerChambreDeLuxe();
+        boolean test =true;
+        while(test){
+            messageAfficheChambres();
+            int compteur = 1;
+
+            for (ChambreDeLuxe chambre : LalisteDeschambreDeLuxe) {
+                if (chambre.getDisponible().equalsIgnoreCase("Oui")) {
+                    System.out.print(compteur + ". ");
+                    AffichageChambre(chambre);
+                    compteur++;
+                }
+            }
+        
+            System.out.print("Choisissez le numéro de la chambre que vous souhaitez réserver :\n=> ");
+            int numeroChoisi = scanner.nextInt();
+            if (numeroChoisi > 0 && numeroChoisi<= compteur - 1) {
+                chambreChoisie  = LalisteDeschambreDeLuxe.get(numeroChoisi -1);
+                test = false;
+                return chambreChoisie;
+            }
+            else {
+                System.out.println("Aucune chambre sélectionnée.");
+                continue;
+            }
+        } 
+        return null;
     }
 
     // Méthode pour créer une chambre de luxe depuis la console
@@ -203,11 +239,7 @@ public class ChambreDeLuxe extends Chambre implements Reservable {
         return nouvelleChambre;
     }
 
-    @Override
-    public void Reservation(Client client, Chambre chambre, String dateDebut, String dateFin) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'Reservation'");
-    }
+    
 
     
 }

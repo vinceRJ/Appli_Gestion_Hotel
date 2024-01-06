@@ -10,17 +10,10 @@ public class HotelManagementApp {
 
     public HotelManagementApp() {
         this.controller = new HotelController();
-        // Initialisation de l'interface utilisateur
     }
 
     public void run() {
-        //controller.creerChambreNormal();
-        //controller.creerChambreDeLuxe();
-        //controller.chargerChambreNormal();
-        //controller.chargerChambreDeLuxe();
-        ///controller.afficherMenuPrincipal();
-        //controller.creerClient();
-       
+               
         controller.afficherMenuPrincipal();
     }
 

@@ -80,14 +80,14 @@ public class Chambre implements Serializable{
             "}";
     }
 
-    protected void messageAfficheChambres() {
+    protected  static void messageAfficheChambres() {
         System.out.println("voici la liste des chambres :");
         System.out.println("_________________________________________________________________________________________________________________________");
         
     }
 
     //  Methode qui affiche les elements de la chambre 
-    protected void AffichageChambre(Chambre chambre){
+    protected static void AffichageChambre(Chambre chambre){
         System.out.print("Numero de chambre : " + chambre.getNumeroChambre()+", "); 
         System.out.print(" Type de chambre: " + chambre.getTypeChambre()+", ");
         System.out.print(" Disponible: " + chambre.getDisponible()+", ");
@@ -95,6 +95,8 @@ public class Chambre implements Serializable{
         System.out.println(chambre);
         System.out.println("_________________________________________________________________________________________________________________________");
     }
+
+    
 
     protected static <T extends Serializable> void chargerListeDepuisFichier(String nomFichier, List<T> liste) {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(nomFichier))) {
